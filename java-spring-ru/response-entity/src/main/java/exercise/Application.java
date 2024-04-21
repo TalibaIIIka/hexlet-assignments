@@ -1,5 +1,6 @@
 package exercise;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,10 +24,12 @@ public class Application {
 
     // BEGIN
     @GetMapping("/posts")
-    public ResponseEntity<List<Post>> getPosts(){
+    public ResponseEntity<List<Post>> getPosts(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer limit) {
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(posts.size()))
-                .body(posts.stream().toList());
+                .body(posts.stream().skip((page - 1) * limit).limit(limit).toList());
     }
 
     @GetMapping("/posts/{postId}")
@@ -35,13 +38,14 @@ public class Application {
                 .filter(p -> p.getId().equals(postId))
                 .findFirst();
 
-        return ResponseEntity.ofNullable(searchedPost.orElse(null));
+        return ResponseEntity.of(searchedPost);
     }
 
     @PostMapping("/posts")
     public ResponseEntity<Post> createPost(@RequestBody Post newPost) {
         posts.add(newPost);
-        return new ResponseEntity<>(newPost, HttpStatus.CREATED);
+        var location = URI.create("/posts");
+        return ResponseEntity.created(location).body(newPost);
     }
 
     @PutMapping("/posts/{postId}")
