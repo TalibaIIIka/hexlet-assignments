@@ -3,7 +3,6 @@ package exercise.controller.users;
 import exercise.Data;
 import exercise.model.Post;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,12 +24,13 @@ public class PostsController {
                 .toList();
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users/{userId}/posts")
-    public ResponseEntity<Post> addPostToUser(@PathVariable int userId, @RequestBody Post newPost) {
+    public Post addPostToUser(@PathVariable int userId, @RequestBody Post newPost) {
         newPost.setUserId(userId);
         posts.add(newPost);
 
-        return new ResponseEntity<>(newPost, HttpStatus.CREATED);
+        return newPost;
     }
 }
 // END
