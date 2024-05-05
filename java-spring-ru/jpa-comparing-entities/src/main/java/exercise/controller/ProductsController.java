@@ -37,7 +37,7 @@ public class ProductsController {
     @ResponseStatus(HttpStatus.CREATED)
     public Product create(@RequestBody Product newProduct) {
         if (productRepository.exists(Example.of(newProduct))) {
-            throw new ResourceAlreadyExistsException("Resource already exists");
+            throw new ResourceAlreadyExistsException("Product " + newProduct.getTitle() + " already exists");
         }
         productRepository.save(newProduct);
         return newProduct;
