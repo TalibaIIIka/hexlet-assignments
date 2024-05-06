@@ -23,20 +23,10 @@ public class ProductsController {
 
     // BEGIN
     @GetMapping(path = "")
-    public List<Product> paging(@RequestParam(defaultValue = "-1") Integer min,
-                                @RequestParam(defaultValue = "-1") Integer max) {
+    public List<Product> paging(@RequestParam(defaultValue = Integer.MIN_VALUE + "") Integer min,
+                                @RequestParam(defaultValue = Integer.MAX_VALUE + "") Integer max) {
         var sort = Sort.by(Sort.Order.asc("price"));
-        if (min > 0) {
-            if (max > 0) {
-                return productRepository.findByPriceBetween(min, max, sort);
-            } else {
-                return productRepository.findByPriceGreaterThanEqual(min, sort);
-            }
-        } else if (max > 0) {
-            return productRepository.findByPriceLessThanEqual(max, sort);
-        }
-
-        return productRepository.findAll(sort);
+        return productRepository.findByPriceBetween(min, max, sort);
     }
     // END
 
