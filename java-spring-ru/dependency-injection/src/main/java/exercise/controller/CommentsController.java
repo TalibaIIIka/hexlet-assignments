@@ -1,5 +1,6 @@
 package exercise.controller;
 
+import exercise.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,9 @@ public class CommentsController {
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Comment> showCommentById(@PathVariable long id) {
-        return ResponseEntity.of(commentRepository.findById(id));
+    public Comment showCommentById(@PathVariable long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment with id " + id + " not found"));
     }
 
     @PostMapping("")

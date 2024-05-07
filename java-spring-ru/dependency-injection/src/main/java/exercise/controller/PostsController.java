@@ -50,14 +50,12 @@ public class PostsController {
 
     @PutMapping(path = "/{id}")
     public Post updatePost(@PathVariable long id, @RequestBody Post updPost) {
-        var searchedPost = postRepository.findById(id);
-        if (searchedPost.isPresent()) {
-            var post = searchedPost.get();
-            post.setBody(updPost.getBody());
-            post.setTitle(updPost.getTitle());
-            return postRepository.save(post);
-        }
-        return updPost;
+        var post = postRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Post with id " + id + " not found"));
+        post.setBody(updPost.getBody());
+        post.setTitle(updPost.getTitle());
+
+        return postRepository.save(post);
     }
 
     @DeleteMapping(path = "/{id}")
