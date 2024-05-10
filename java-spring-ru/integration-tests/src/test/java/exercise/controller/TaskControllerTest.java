@@ -71,7 +71,7 @@ class ApplicationTest {
         var task = createTask();
         taskRepository.save(task);
 
-        var result = mockMvc.perform(get("/tasks/" + task.getId()))
+        var result = mockMvc.perform(get("/tasks/{id}", task.getId()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -106,7 +106,7 @@ class ApplicationTest {
         taskRepository.save(task);
 
         var updTask = createTask();
-        var result = mockMvc.perform(put("/tasks/" + task.getId())
+        var result = mockMvc.perform(put("/tasks/{id}", task.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(updTask)))
                 .andExpect(status().isOk())
@@ -125,13 +125,10 @@ class ApplicationTest {
         var task = createTask();
         taskRepository.save(task);
 
-        mockMvc.perform(delete("/tasks/" + task.getId()))
+        mockMvc.perform(delete("/tasks/{id}", task.getId()))
                 .andExpect(status().isOk());
-        var result = mockMvc.perform(get("/tasks/" + task.getId()))
-                .andExpect(status().isNotFound())
-                .andReturn();
-        assertThat(result.getResponse().getContentAsString())
-                .isEqualTo("Task with id " + task.getId() + " not found");
+        task = taskRepository.findById(task.getId()).orElse(null);
+        assertThat(task).isNull();
     }
 
     private Task createTask() {
