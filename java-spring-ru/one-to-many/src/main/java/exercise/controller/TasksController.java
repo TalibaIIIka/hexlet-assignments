@@ -53,7 +53,7 @@ public class TasksController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskDTO create(@RequestBody TaskCreateDTO dto) {
+    public TaskDTO create(@Valid @RequestBody TaskCreateDTO dto) {
         var task = taskMapper.map(dto);
         taskRepository.save(task);
         return taskMapper.map(task);
@@ -64,16 +64,10 @@ public class TasksController {
     public TaskDTO update(@PathVariable Long id, @RequestBody TaskUpdateDTO taskData) {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
-        var currentAuthor = task.getAssignee();
-        var newAuthor = userRepository.findById(taskData.getAssigneeId())
-                .orElse(null);
-        if (!currentAuthor.equals(newAuthor)) {
-            currentAuthor.removeTask(task);
-            if (newAuthor != null) {
-                newAuthor.addTask(task);
-            }
-        }
+        var author = userRepository.findById(taskData.getAssigneeId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         taskMapper.update(taskData, task);
+        task.setAssignee(author);
         return taskMapper.map(taskRepository.save(task));
     }
 
